@@ -1,0 +1,10 @@
+.form{
+    background: rgb(57, 213, 240);
+    height: 100vh;
+}
+.row{
+    width: 900px;
+}
+.row input{
+margin-top: 10px;
+}
