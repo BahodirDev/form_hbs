@@ -7,8 +7,8 @@ const path = require('path');
 const { engine } = require('express-handlebars');
 const { urlencoded } = require('express');
 
-app.use(express.json( { extended: false } ));
-app.use(express.urlencoded({extended:false}));
+app.use(express.json({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 
 
 app.engine(".hbs", engine({ extname: ".hbs" }));
@@ -23,20 +23,48 @@ app.get('/', (req, res) => {
 
 
 // forms
-app.get('/form',(req,res)=>{
+app.get('/form', (req, res) => {
     res.render("form")
 })
 
-app.post('/insert',async(req,res)=>{
-    const {name,last_name,tel} = req.body;
-    const data = await pool.query("INSERT INTO users(name,last_name,tel) VALUES($1,$2,$3) returning *",[name,last_name,tel])
-        console.log(data.rows[0]);
+// qo'shish
+app.post('/insert', async (req, res) => {
+    const { name, last_name, tel } = req.body;
+    const data = await pool.query("INSERT INTO users(name,last_name,tel) VALUES($1,$2,$3) returning *", [name, last_name, tel])
     res.redirect("/form")
 })
 
+// delete
+app.get('/delete/:id', async (req, res) => {
+    let data = await pool.query("DELETE FROM users WHERE id =($1)", [req.params.id]);
+    res.redirect('/api')
+    console.log(data.rows[0]);
+})
+
+// update
+app.get('/edit/:id', async (req, res) => {
+    let data = await pool.query("SELECT * FROM users WHERE id =($1)", [req.params.id]);
+    res.render('editForm', { users: data.rows })
+})
+
+// edit
+app.post('/update', async (req, res) => {
+
+    const { name, last_name, id, tel } = req.body;
+
+    let data = await pool.query("SELECT * FROM users WHERE id =($1)", [id]);
+
+    let data2 = await pool.query("UPDATE users SET name = ($1), last_name=($2), tel=($3) WHERE id = ($4)", [name ? name : data.rows[0].name, last_name ? last_name : data.rows[0].last_name, tel ? tel : data.rows[0].tel, id])
+
+    console.log(data2.rows[0]);
+
+    res.redirect('/api')
+})
+
+
+
 app.get("/api", async (req, res) => {
     const data = await pool.query("SELECT * FROM users");
-    console.log(data.rows);
     res.render('index', { title: data.rows });
     // res.json(data.rows)
 });

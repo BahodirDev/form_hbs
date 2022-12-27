@@ -1,0 +1,13 @@
+<div class="form d-flex align-items-center justify-content-center">
+    {{#each users}}
+    <div class="row">
+            <form action="/update" method="POST"> 
+                <input value={{name}} type="text" name="name" class="form-control">
+                <input value={{last_name}} type="text" name="last_name" class="form-control">
+                <input value={{tel}} type="number" name="tel" class="form-control">
+                <input value={{id}}  type="hidden" name="id" class="form-control">
+                <button class="btn btn-warning w-100 mt-2">Send</button>
+            </form>
+    </div>
+    {{/each}}
+</div>
